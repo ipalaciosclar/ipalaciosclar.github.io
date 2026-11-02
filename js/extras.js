@@ -96,18 +96,22 @@
       var na = ease((ms - 1650) / 900);
       drawName(na, (1 - na) * 24);
     }
+    var running = false;
     var start = function () {
       layoutName();
       if (reduce) { frame(99999); return; }
+      running = true;
+      cells.forEach(function (c) { c.tx = Math.random() * W; c.ty = 40 + Math.random() * (H - 60); });
       var t0 = null;
       function loop(ts) {
         if (t0 === null) t0 = ts;
         var ms = ts - t0;
         frame(ms);
-        if (ms < 2900) requestAnimationFrame(loop);
+        if (ms < 2900) requestAnimationFrame(loop); else running = false;
       }
       requestAnimationFrame(loop);
     };
+    cv.addEventListener("click", function () { if (!running && !reduce) start(); });
     var started = false;
     var go = function () { if (!started) { started = true; start(); } };
     if (document.fonts && document.fonts.load) {
@@ -161,4 +165,75 @@
       }, 45);
     });
   }
+
+  // ----- Scroll progress bar -----
+  if (!reduce) {
+    var bar = document.createElement("div"); bar.className = "scroll-progress"; document.body.appendChild(bar);
+    var tick = false;
+    var upd = function () {
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.transform = "scaleX(" + (h > 0 ? window.scrollY / h : 0) + ")"; tick = false;
+    };
+    window.addEventListener("scroll", function () { if (!tick) { tick = true; requestAnimationFrame(upd); } }, { passive: true });
+    upd();
+  }
+
+  // ----- Stagger: tags, project blocks, stats, education, contact buttons -----
+  document.querySelectorAll(".tags, .project__body, .about__stats, .education__grid, .project__metrics").forEach(function (g) {
+    g.classList.add("stagger");
+    Array.prototype.forEach.call(g.children, function (ch, i) { ch.style.setProperty("--i", i); });
+  });
+
+  // ----- Section numbers scramble before settling -----
+  if (!reduce) {
+    document.querySelectorAll(".section__index").forEach(function (el) {
+      var final = el.textContent;
+      onVisible(el, function () {
+        var k = 0, iv = setInterval(function () {
+          el.textContent = k < 10 ? String(Math.floor(Math.random() * 10)) + String(Math.floor(Math.random() * 10)) : final;
+          if (++k > 10) clearInterval(iv);
+        }, 50);
+      }, 0.8);
+    });
+  }
+
+  // ----- Active section in the nav -----
+  var links = {};
+  document.querySelectorAll(".nav__menu a[href^='#']").forEach(function (a) { links[a.getAttribute("href").slice(1)] = a; });
+  if ("IntersectionObserver" in window) {
+    var secIO = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        var l = links[e.target.id]; if (!l) return;
+        if (e.isIntersecting) { Object.keys(links).forEach(function (k) { links[k].classList.remove("is-active"); }); l.classList.add("is-active"); }
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    document.querySelectorAll("main section[id]").forEach(function (sec) { secIO.observe(sec); });
+  }
+
+  // ----- Portrait tilts with the pointer -----
+  var pic = document.querySelector(".about__portrait img");
+  if (pic && !reduce && window.matchMedia("(hover: hover)").matches) {
+    var fig = pic.parentNode;
+    fig.addEventListener("mousemove", function (e) {
+      var r = fig.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+      pic.style.transform = "perspective(800px) rotateY(" + (x * 8) + "deg) rotateX(" + (-y * 8) + "deg) scale(1.02)";
+    });
+    fig.addEventListener("mouseleave", function () { pic.style.transform = ""; });
+  }
+})();
+
+// ----- Lede sentences: words rise one by one -----
+(function () {
+  "use strict";
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelectorAll(".about__lede, .contact__lede, .projects__lede").forEach(function (p) {
+    var words = p.textContent.trim().split(/\s+/);
+    p.innerHTML = words.map(function (w, i) { return '<span class="w" style="--d:' + (i * 30) + 'ms">' + w + "</span>"; }).join(" ");
+    if (!("IntersectionObserver" in window)) { p.classList.add("words-in"); return; }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { io.disconnect(); p.classList.add("words-in"); } });
+    }, { threshold: 0.4 });
+    io.observe(p);
+  });
 })();

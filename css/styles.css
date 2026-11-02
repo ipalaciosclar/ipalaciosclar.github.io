@@ -1104,3 +1104,91 @@ h1, h2, h3 {
 /* nav digits reshuffle on hover */
 .nav__mark-digits text { transition: opacity .15s ease; }
 @media (prefers-reduced-motion: reduce) { .closecal__day { transition: none; } }
+
+/* ---------- Extra motion ---------- */
+.scroll-progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: 0 50%; z-index: 101; pointer-events: none; }
+
+/* timeline: rule draws downwards, marker pops in, current role pulses */
+.js .timeline__item::before { transform: scaleY(0); transform-origin: top; transition: transform 1.1s ease 0.25s; }
+.js .timeline__item.is-visible::before { transform: none; }
+.js .timeline__item::after { transform: scale(0); transition: transform 0.5s cubic-bezier(.3,1.6,.5,1) 0.1s; }
+.js .timeline__item.is-visible::after { transform: none; }
+.timeline__item:first-child.is-visible::after { animation: dot-pulse 2.4s ease-out 1.2s infinite; }
+@keyframes dot-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+  70% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+/* children appear one after another */
+.js .stagger > * { opacity: 0; transform: translateY(12px); transition: opacity 0.55s ease, transform 0.55s ease, background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease; transition-delay: calc(var(--i, 0) * 80ms + 0.2s); }
+.js .is-visible .stagger > *, .js .stagger.is-visible > * { opacity: 1; transform: none; }
+
+/* hover states */
+.tags li { transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+.tags li:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--accent-ink); }
+.stat { transition: background-color 0.25s ease; }
+.stat:hover { background: #FFFFFF; }
+.button { transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; }
+.button:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -8px rgba(35, 39, 44, 0.35); }
+.button:active { transform: translateY(0); box-shadow: none; }
+
+/* nav: underline sweeps in on hover and on the section in view */
+.nav__menu a:not(.nav__cta) { position: relative; }
+.nav__menu a:not(.nav__cta)::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 1px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease; }
+.nav__menu a:not(.nav__cta):hover::after, .nav__menu a.is-active::after { transform: scaleX(1); }
+.nav__menu a.is-active { color: var(--ink); }
+
+/* portrait tilts with the pointer */
+.about__portrait img { transition: transform 0.4s ease; will-change: transform; }
+
+/* hero name can be replayed */
+.hero__name canvas { cursor: pointer; }
+
+/* project titles: accent rule grows under the kicker */
+.project__kicker { position: relative; }
+.js .project__kicker::after { content: ""; display: block; width: 2.5rem; height: 1px; margin-top: 0.6rem; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.8s ease 0.35s; }
+.js .project.is-visible .project__kicker::after { transform: scaleX(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress { display: none; }
+  .js .timeline__item::before, .js .timeline__item::after, .js .stagger > *, .js .project__kicker::after { transform: none; opacity: 1; transition: none; animation: none; }
+  .tags li, .button, .about__portrait img { transition: none; }
+  .tags li:hover, .button:hover { transform: none; }
+}
+
+/* ---------- More motion ---------- */
+/* section titles wipe in from the left */
+.js .section__head .section__title { clip-path: inset(0 100% 0 0); transition: clip-path 0.9s cubic-bezier(.2,.7,.2,1) 0.15s; }
+.js .section__head.is-visible .section__title { clip-path: inset(0 -0.2em 0 0); }
+
+/* lede sentences: words rise one by one */
+.js .w { display: inline-block; opacity: 0; transform: translateY(0.4em); transition: opacity 0.5s ease, transform 0.5s ease; transition-delay: var(--d, 0ms); }
+.js .words-in .w { opacity: 1; transform: none; }
+
+/* Challenge / Approach / Outcome labels get an underline */
+.project__label { position: relative; display: inline-block; }
+.js .project__label::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.6s ease; }
+.js .project.is-visible .project__label::after { transform: scaleX(1); }
+.js .project.is-visible .project__block:nth-child(1) .project__label::after { transition-delay: 0.4s; }
+.js .project.is-visible .project__block:nth-child(2) .project__label::after { transition-delay: 0.6s; }
+.js .project.is-visible .project__block:nth-child(3) .project__label::after { transition-delay: 0.8s; }
+
+/* portrait floats gently */
+.about__portrait { animation: float 7s ease-in-out infinite; }
+@keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+
+/* primary buttons: light sweep on hover */
+.button--primary { position: relative; overflow: hidden; }
+.button--primary::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.3) 50%, transparent 70%); transform: translateX(-120%); pointer-events: none; }
+.button--primary:hover::after { transform: translateX(120%); transition: transform 0.7s ease; }
+
+/* close calendar: freed days shrink away */
+.closecal__day.is-freed { transform: scale(0.82); }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .section__head .section__title { clip-path: none; transition: none; }
+  .js .w { opacity: 1; transform: none; transition: none; }
+  .about__portrait { animation: none; }
+  .button--primary::after { display: none; }
+}
