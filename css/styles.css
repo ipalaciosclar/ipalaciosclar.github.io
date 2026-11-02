@@ -549,7 +549,7 @@ h1, h2, h3 {
 
 .education__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: clamp(1.5rem, 4vw, 3rem);
 }
 
@@ -1096,7 +1096,7 @@ h1, h2, h3 {
 .closecal__head > span { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
 .closecal__num { font-family: var(--font-display); font-weight: 600; font-size: 2rem; line-height: 1; color: var(--accent-ink); font-variant-numeric: tabular-nums; }
 .closecal__num small { font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; color: var(--ink-soft); margin-left: 0.3rem; }
-.closecal__days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.closecal__days { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
 .closecal__day { aspect-ratio: 1; border-radius: 3px; background: #CBD1C9; font-size: 0.68rem; color: var(--ink-soft); display: flex; align-items: flex-end; justify-content: flex-end; padding: 2px 4px; transition: background-color .3s ease, color .3s ease, transform .3s ease; }
 .closecal__day.is-done { background: var(--accent); color: #fff; transform: scale(1.06); }
 .closecal__day.is-freed { background: #ECEDE8; color: transparent; }

@@ -133,15 +133,15 @@
     }, 0.6);
   });
 
-  // ----- Close calendar: 14 working days shrink to 3 -----
+  // ----- Close calendar: 12 working days shrink to 3 -----
   var grid = document.getElementById("closeGrid"), num = document.getElementById("closeDays");
   if (grid && num) {
     var days = [];
-    for (var i = 1; i <= 14; i++) { var d = document.createElement("div"); d.className = "closecal__day"; d.textContent = i; grid.appendChild(d); days.push(d); }
+    for (var i = 1; i <= 12; i++) { var d = document.createElement("div"); d.className = "closecal__day"; d.textContent = i; grid.appendChild(d); days.push(d); }
     var finish = function () { days.forEach(function (d, i) { d.className = "closecal__day " + (i < 3 ? "is-done" : "is-freed"); }); num.textContent = "3"; };
     if (reduce) finish();
     else onVisible(grid, function () {
-      var n = 14;
+      var n = 12;
       setTimeout(function step() {
         if (n > 3) { n--; days[n].className = "closecal__day is-freed"; num.textContent = n; setTimeout(step, 150); }
         else days.slice(0, 3).forEach(function (d, i) { setTimeout(function () { d.className = "closecal__day is-done"; }, i * 180); });
